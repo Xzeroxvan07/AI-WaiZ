@@ -1,0 +1,12 @@
+flask==2.0.1
+requests==2.28.1
+python-docx==0.8.11
+redis==4.3.4
+uuid==1.30
+docx2pdf==0.1.8
+python-dotenv==0.20.0
+gunicorn==20.1.0
+pydub==0.25.1
+# Uncomment jika diperlukan untuk transkripsi audio
+# openai-whisper==20230314
+# google-cloud-speech==2.13.1
