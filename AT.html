@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-WaiZ - Asisten AI</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --background-color: #f5f8fa;
+            --text-color: #333;
+            --light-text: #888;
+            --border-color: #ddd;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --error-color: #e74c3c;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 8px;
+            margin: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .controls {
+            padding: 1rem;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 8px;
+            margin: 0 1rem 1rem 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .input-area {
+            flex: 1;
+            display: flex;
+        }
+        
+        .message-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            resize: none;
+            min-height: 20px;
+            max-height: 120px;
+        }
+        
+        .send-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0 16px;
+            cursor: pointer;
+            height: 40px;
+            margin-left: 10px;
+            transition: background-color 0.2s;
+        }
+        
+        .send-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .voice-btn {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0 16px;
+            cursor: pointer;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background-color 0.2s;
+        }
+        
+        .voice-btn.active {
+            background-color: #e74c3c;
+        }
+        
+        .voice-btn:hover {
+            filter: brightness(0.9);
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .menu-item {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            padding: 12px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        
+        .user-message {
+            background-color: #e8f4fd;
+            margin-left: auto;
+            border-bottom-right-radius: 0;
+        }
+        
+        .bot-message {
+            background-color: #f0f0f0;
+            margin-right: auto;
+            border-bottom-left-radius: 0;
+        }
+        
+        .message-time {
+            font-size: 12px;
+            color: var(--light-text);
+            margin-top: 4px;
+            text-align: right;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: #f0f0f0;
+            margin-right: auto;
+            border-bottom-left-radius: 0;
+            max-width: 80px;
+            margin-bottom: 1rem;
+        }
+        
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background-color: var(--light-text);
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: bounce 1.5s infinite ease-in-out;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+        }
+        
+        .status-bar {
+            background-color: rgba(0, 0, 0, 0.05);
+            padding: 8px 16px;
+            font-size: 14px;
+            color: var(--light-text);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .material-symbols-outlined {
+            font-size: 20px;
+        }
+        
+        /* Responsif untuk layar kecil */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: 0.5rem;
+            }
+            
+            .logo {
+                margin-bottom: 0.5rem;
+            }
+            
+            .menu-container {
+                display: flex;
+                overflow-x: auto;
+                margin-bottom: 0.5rem;
+            }
+            
+            .menu-item {
+                margin-right: 10px;
+                margin-bottom: 0;
+                white-space: nowrap;
+            }
+            
+            .chat-container {
+                margin: 0.5rem;
+            }
+            
+            .controls {
+                margin: 0 0.5rem 0.5rem 0.5rem;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <span class="material-symbols-outlined">smart_toy</span>
+                AI-WaiZ
+            </div>
+            <div class="menu-container">
+                <div class="menu-item active">
+                    <span class="material-symbols-outlined">chat</span>
+                    Chat
+                </div>
+                <div class="menu-item">
+                    <span class="material-symbols-outlined">settings</span>
+                    Pengaturan
+                </div>
+                <div class="menu-item">
+                    <span class="material-symbols-outlined">help</span>
+                    Bantuan
+                </div>
+            </div>
+            <div style="flex: 1;"></div>
+            <div class="menu-item">
+                <span class="material-symbols-outlined">info</span>
+                Tentang
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="chat-container" id="chat-container">
+                <div class="message bot-message">
+                    Halo! Saya WaiZ, asisten AI Anda. Ada yang bisa saya bantu hari ini?
+                    <div class="message-time">Hari ini, 12:00</div>
+                </div>
+                <!-- Pesan akan ditambahkan di sini -->
+            </div>
+            
+            <div class="controls">
+                <div class="input-area">
+                    <textarea class="message-input" id="message-input" placeholder="Ketik pesan Anda di sini..." rows="1"></textarea>
+                    <button class="send-btn" id="send-btn">
+                        <span class="material-symbols-outlined">send</span>
+                    </button>
+                </div>
+                <button class="voice-btn" id="voice-btn">
+                    <span class="material-symbols-outlined">mic</span>
+                    Suara
+                </button>
+            </div>
+            
+            <div class="status-bar">
+                <div id="status">Siap</div>
+                <div>WaiZ v1.0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatContainer = document.getElementById('chat-container');
+            const messageInput = document.getElementById('message-input');
+            const sendBtn = document.getElementById('send-btn');
+            const voiceBtn = document.getElementById('voice-btn');
+            const statusElement = document.getElementById('status');
+            
+            let isVoiceActive = false;
+            let conversationHistory = [];
+            
+            // Auto-resize textarea
+            messageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+                if (this.scrollHeight > 120) {
+                    this.style.overflowY = 'auto';
+                } else {
+                    this.style.overflowY = 'hidden';
+                }
+            });
+            
+            // Handle Enter key
+            messageInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            // Send message button
+            sendBtn.addEventListener('click', sendMessage);
+            
+            // Voice button
+            voiceBtn.addEventListener('click', toggleVoiceAssistant);
+            
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (!message) return;
+                
+                // Add user message to chat
+                addMessage('user', message);
+                
+                // Clear input
+                messageInput.value = '';
+                messageInput.style.height = 'auto';
+                
+                // Show typing indicator
+                showTypingIndicator();
+                
+                // Send to API
+                fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Hide typing indicator
+                    hideTypingIndicator();
+                    
+                    // Add bot response to chat
+                    addMessage('bot', data.response);
+                    
+                    // Update conversation history
+                    conversationHistory = data.history || conversationHistory;
+                    
+                    // Automatically speak the response if voice is active
+                    if (isVoiceActive) {
+                        speakText(data.response);
+                    }
+                })
+                .catch(error => {
+                    hideTypingIndicator();
+                    statusElement.textContent = 'Error: ' + error.message;
+                    console.error('Error:', error);
+                });
+            }
+            
+            function addMessage(type, text) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type === 'user' ? 'user-message' : 'bot-message'}`;
+                
+                // Process markdown-like formatting
+                let formattedText = text
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/\n/g, '<br>');
+                
+                messageDiv.innerHTML = formattedText;
+                
+                // Add timestamp
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                
+                const now = new Date();
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                timeDiv.textContent = `${hours}:${minutes}`;
+                
+                messageDiv.appendChild(timeDiv);
+                chatContainer.appendChild(messageDiv);
+                
+                // Scroll to bottom
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            function showTypingIndicator() {
+                const indicator = document.createElement('div');
+                indicator.className = 'typing-indicator';
+                indicator.id = 'typing-indicator';
+                
+                for (let i = 0; i < 3; i++) {
+                    const dot = document.createElement('span');
+                    indicator.appendChild(dot);
+                }
+                
+                chatContainer.appendChild(indicator);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            function hideTypingIndicator() {
+                const indicator = document.getElementById('typing-indicator');
+                if (indicator) {
+                    indicator.remove();
+                }
+            }
+            
+            function toggleVoiceAssistant() {
+                if (isVoiceActive) {
+                    // Matikan asisten suara
+                    fetch('/api/voice/stop', {
+                        method: 'POST'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        isVoiceActive = false;
+                        voiceBtn.classList.remove('active');
+                        voiceBtn.innerHTML = '<span class="material-symbols-outlined">mic</span> Suara';
+                        statusElement.textContent = 'Asisten suara dinonaktifkan';
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        statusElement.textContent = 'Error saat mematikan asisten suara';
+                    });
+                } else {
+                    // Aktifkan asisten suara
+                    fetch('/api/voice/start', {
+                        method: 'POST'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        isVoiceActive = true;
+                        voiceBtn.classList.add('active');
+                        voiceBtn.innerHTML = '<span class="material-symbols-outlined">mic_off</span> Matikan';
+                        statusElement.textContent = 'Asisten suara diaktifkan. Ucapkan "waiz" untuk memulai';
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        statusElement.textContent = 'Error saat mengaktifkan asisten suara';
+                    });
+                }
+            }
+            
+            function speakText(text) {
+                fetch('/api/tts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text: text })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        console.error('TTS error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+            
+            // Tampilkan status "Online"
+            statusElement.textContent = 'Online';
+        });
+    </script>
+</body>
+</html>
