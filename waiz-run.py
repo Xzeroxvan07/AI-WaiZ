@@ -22,7 +22,6 @@ logger = logging.getLogger("AI-WaiZ")
 def check_dependencies():
     """Memeriksa dependensi yang diperlukan"""
     try:
-        form app import app
         import speech_recognition as sr
         import pyttsx3
         from openai import OpenAI
