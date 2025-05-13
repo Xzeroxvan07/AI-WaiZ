@@ -3,7 +3,7 @@
 """
 AI-WaiZ: Asisten Virtual Berbasis Suara
 """
-
+form app import app
 import os
 import sys
 import argparse
